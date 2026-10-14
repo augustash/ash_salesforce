@@ -1,0 +1,21 @@
+{
+  "name": "augustash/ash_salesforce",
+  "description": "Sends Drupal form submissions to Salesforce through the Web-to-Case or Web-to-Lead form the client's Salesforce admin generates.",
+  "type": "drupal-module",
+  "license": "proprietary",
+  "homepage": "https://github.com/augustash/ash_salesforce",
+  "authors": [
+    {
+      "name": "Kazajhodo",
+      "homepage": "https://www.augustash.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/augustash/ash_salesforce/issues",
+    "source": "https://github.com/augustash/ash_salesforce"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^10.3 || ^11"
+  }
+}

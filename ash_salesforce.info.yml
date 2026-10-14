@@ -1,0 +1,6 @@
+name: Ash Salesforce
+type: module
+description: Sends form submissions to Salesforce through the Web-to-Case or Web-to-Lead form the client's Salesforce admin generates.
+core_version_requirement: ^10.3 || ^11
+package: August Ash
+configure: entity.ash_salesforce_mapping.collection

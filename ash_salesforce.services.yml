@@ -1,0 +1,22 @@
+services:
+  logger.channel.ash_salesforce:
+    parent: logger.channel_base
+    arguments: ['ash_salesforce']
+  ash_salesforce.form_parser:
+    class: Drupal\ash_salesforce\Salesforce\FormParser
+  ash_salesforce.guesser:
+    class: Drupal\ash_salesforce\Guesser
+  ash_salesforce.sources:
+    class: Drupal\ash_salesforce\Source\SourceManager
+    arguments: ['@class_resolver', '@module_handler']
+  ash_salesforce.client:
+    class: Drupal\ash_salesforce\Salesforce\Client
+    arguments: ['@http_client']
+  ash_salesforce.dispatcher:
+    class: Drupal\ash_salesforce\Dispatcher
+    arguments: ['@entity_type.manager', '@ash_salesforce.sources', '@ash_salesforce.form_parser', '@queue', '@ash_salesforce.queue_runner', '@logger.channel.ash_salesforce']
+  ash_salesforce.queue_runner:
+    class: Drupal\ash_salesforce\EventSubscriber\QueueRunner
+    arguments: ['@queue', '@plugin.manager.queue_worker', '@logger.channel.ash_salesforce']
+    tags:
+      - { name: event_subscriber }

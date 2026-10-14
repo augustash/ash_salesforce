@@ -1,0 +1,4 @@
+administer ash_salesforce:
+  title: 'Administer Salesforce form mappings'
+  description: 'Paste Salesforce-generated forms and choose which site form fields they receive.'
+  restrict access: true

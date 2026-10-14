@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Sends form submissions to Salesforce through Web-to-Case and Web-to-Lead.
+ */
+
+use Drupal\contact\MessageForm;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for webform_submission.
+ */
+function ash_salesforce_webform_submission_insert(EntityInterface $submission) {
+  \Drupal::service('ash_salesforce.dispatcher')->dispatch($submission, FALSE);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for webform_submission.
+ *
+ * A draft reaches Salesforce on the save that completes it.
+ */
+function ash_salesforce_webform_submission_update(EntityInterface $submission) {
+  \Drupal::service('ash_salesforce.dispatcher')->dispatch($submission, TRUE);
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Contact messages are sent on submit, not on insert: without contact_storage
+ * a message is never stored, so no insert hook fires.
+ */
+function ash_salesforce_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  if ($form_state->getFormObject() instanceof MessageForm && isset($form['actions']['submit'])) {
+    $form['actions']['submit']['#submit'][] = 'ash_salesforce_contact_message_submit';
+  }
+}
+
+/**
+ * Submit handler: queues a contact message for Salesforce.
+ */
+function ash_salesforce_contact_message_submit(array $form, FormStateInterface $form_state) {
+  \Drupal::service('ash_salesforce.dispatcher')->dispatch($form_state->getFormObject()->getEntity(), FALSE);
+}

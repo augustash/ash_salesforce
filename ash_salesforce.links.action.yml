@@ -1,0 +1,10 @@
+entity.ash_salesforce_mapping.add_form:
+  title: 'Add mapping'
+  route_name: entity.ash_salesforce_mapping.add_form
+  appears_on:
+    - entity.ash_salesforce_mapping.collection
+entity.ash_salesforce_form.add_form:
+  title: 'Add Salesforce form'
+  route_name: entity.ash_salesforce_form.add_form
+  appears_on:
+    - entity.ash_salesforce_form.collection

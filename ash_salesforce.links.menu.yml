@@ -1,0 +1,5 @@
+entity.ash_salesforce_mapping.collection:
+  title: 'Salesforce form mappings'
+  description: 'Send site form submissions to Salesforce as Cases or Leads.'
+  parent: system.admin_config_services
+  route_name: entity.ash_salesforce_mapping.collection

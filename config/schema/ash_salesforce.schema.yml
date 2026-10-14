@@ -1,0 +1,40 @@
+ash_salesforce.form.*:
+  type: config_entity
+  label: 'Salesforce form'
+  mapping:
+    id:
+      type: machine_name
+      label: 'ID'
+    label:
+      type: required_label
+      label: 'Label'
+    html:
+      type: string
+      label: 'The form HTML Salesforce generated'
+
+ash_salesforce.mapping.*:
+  type: config_entity
+  label: 'Salesforce form mapping'
+  mapping:
+    id:
+      type: machine_name
+      label: 'ID'
+    label:
+      type: required_label
+      label: 'Label'
+    source:
+      type: string
+      label: 'Site form, as source:bundle'
+    salesforce_form:
+      type: string
+      label: 'Salesforce form ID'
+    fields:
+      type: sequence
+      label: 'Salesforce field key per site form field; _none sends nothing'
+      sequence:
+        type: string
+    constants:
+      type: sequence
+      label: 'Fixed value per Salesforce field key; a picklist value is its option label'
+      sequence:
+        type: string

@@ -1,0 +1,8 @@
+entity.ash_salesforce_mapping.collection:
+  title: 'Mappings'
+  route_name: entity.ash_salesforce_mapping.collection
+  base_route: entity.ash_salesforce_mapping.collection
+entity.ash_salesforce_form.collection:
+  title: 'Salesforce forms'
+  route_name: entity.ash_salesforce_form.collection
+  base_route: entity.ash_salesforce_mapping.collection
