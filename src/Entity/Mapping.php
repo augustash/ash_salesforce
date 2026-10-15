@@ -16,6 +16,49 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Fields and constants are keyed by the parsed form's stable keys, never by
  * org-specific IDs, so pointing a mapping at another org's form (sandbox to
  * production) is a single setting.
+ *
+ * Declared twice: Drupal 10 reads only the annotation, and entity type
+ * attributes arrived in 11.1. Keep the two in step until 10 is dropped.
+ *
+ * @ConfigEntityType(
+ *   id = "ash_salesforce_mapping",
+ *   label = @Translation("Salesforce form mapping"),
+ *   label_collection = @Translation("Salesforce form mappings"),
+ *   label_singular = @Translation("Salesforce form mapping"),
+ *   label_plural = @Translation("Salesforce form mappings"),
+ *   config_prefix = "mapping",
+ *   entity_keys = {
+ *     "id" = "id",
+ *     "label" = "label",
+ *     "status" = "status",
+ *   },
+ *   handlers = {
+ *     "list_builder" = "Drupal\ash_salesforce\MappingListBuilder",
+ *     "form" = {
+ *       "add" = "Drupal\ash_salesforce\Form\MappingForm",
+ *       "edit" = "Drupal\ash_salesforce\Form\MappingForm",
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
+ *   },
+ *   links = {
+ *     "collection" = "/admin/config/services/ash-salesforce",
+ *     "add-form" = "/admin/config/services/ash-salesforce/add",
+ *     "edit-form" = "/admin/config/services/ash-salesforce/{ash_salesforce_mapping}",
+ *     "delete-form" = "/admin/config/services/ash-salesforce/{ash_salesforce_mapping}/delete",
+ *   },
+ *   admin_permission = "administer ash_salesforce",
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "source",
+ *     "salesforce_form",
+ *     "fields",
+ *     "constants",
+ *   },
+ * )
  */
 #[ConfigEntityType(
   id: 'ash_salesforce_mapping',
