@@ -8,6 +8,7 @@
 use Drupal\contact\MessageForm;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\webform\Utility\WebformFormHelper;
 
 /**
  * Implements hook_ENTITY_TYPE_insert() for webform_submission.
@@ -32,9 +33,47 @@ function ash_salesforce_webform_submission_update(EntityInterface $submission) {
  * a message is never stored, so no insert hook fires.
  */
 function ash_salesforce_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
-  if ($form_state->getFormObject() instanceof MessageForm && isset($form['actions']['submit'])) {
+  $form_object = $form_state->getFormObject();
+  if (!$form_object instanceof MessageForm) {
+    return;
+  }
+  if (isset($form['actions']['submit'])) {
     $form['actions']['submit']['#submit'][] = 'ash_salesforce_contact_message_submit';
   }
+  $limits = \Drupal::service('ash_salesforce.dispatcher')->maxlengths('contact', $form_object->getEntity()->bundle());
+  foreach ($limits as $name => $max) {
+    // Sender name and mail are plain elements; the rest are field widgets.
+    if (isset($form[$name]['widget'][0]['value'])) {
+      _ash_salesforce_cap($form[$name]['widget'][0]['value'], $max);
+    }
+    elseif (isset($form[$name]['#type'])) {
+      _ash_salesforce_cap($form[$name], $max);
+    }
+  }
+}
+
+/**
+ * Implements hook_webform_submission_form_alter().
+ */
+function ash_salesforce_webform_submission_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $limits = \Drupal::service('ash_salesforce.dispatcher')->maxlengths('webform', $form_state->getFormObject()->getEntity()->getWebform()->id());
+  if (!$limits || !isset($form['elements'])) {
+    return;
+  }
+  $elements = &WebformFormHelper::flattenElements($form['elements']);
+  foreach (array_intersect_key($limits, $elements) as $key => $max) {
+    _ash_salesforce_cap($elements[$key], $max);
+  }
+}
+
+/**
+ * Caps an input at what Salesforce keeps.
+ *
+ * Salesforce drops or cuts an overlong value without a word, so the visitor
+ * is stopped at the limit instead. A tighter limit already set stays.
+ */
+function _ash_salesforce_cap(array &$element, int $max): void {
+  $element['#maxlength'] = min($max, $element['#maxlength'] ?? $max);
 }
 
 /**

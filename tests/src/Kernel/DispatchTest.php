@@ -253,6 +253,36 @@ class DispatchTest extends KernelTestBase {
   }
 
   /**
+   * Inputs are capped at what Salesforce keeps, so the visitor sees the limit.
+   */
+  public function testInputsCappedAtSalesforceLengths(): void {
+    $form = Webform::load('inquiry')->getSubmissionForm();
+    // The fixture's First Name holds 40, Last Name 80, Subject 80.
+    $this->assertSame(40, $form['elements']['first_name']['#maxlength']);
+    $this->assertSame(80, $form['elements']['last_name']['#maxlength']);
+    // Not sent, so not capped.
+    $this->assertArrayNotHasKey('#maxlength', $form['elements']['message']);
+
+    ContactForm::create(['id' => 'feedback', 'label' => 'Feedback', 'recipients' => []])->save();
+    $this->container->get('entity_display.repository')->getFormDisplay('contact_message', 'feedback')
+      ->setComponent('subject', ['type' => 'string_textfield'])
+      ->save();
+    Mapping::create([
+      'id' => 'feedback',
+      'label' => 'Feedback',
+      'source' => 'contact:feedback',
+      'salesforce_form' => 'uat',
+      'fields' => ['name' => 'first_name', 'subject' => 'subject'],
+      // A disabled mapping still caps: the form reads the same everywhere.
+      'status' => FALSE,
+    ])->save();
+    User::create(['uid' => 0, 'name' => ''])->save();
+    $form = $this->container->get('entity.form_builder')->getForm(Message::create(['contact_form' => 'feedback']));
+    $this->assertSame(40, $form['name']['#maxlength']);
+    $this->assertSame(80, $form['subject']['widget'][0]['value']['#maxlength']);
+  }
+
+  /**
    * A Salesforce outage leaves the submission for cron instead of losing it.
    */
   public function testServerErrorKeepsSubmissionQueued(): void {

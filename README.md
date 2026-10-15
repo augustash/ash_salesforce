@@ -57,8 +57,12 @@ $config['ash_salesforce.mapping.contact']['status'] = FALSE;
 
 - **Web-to-Case answers 200 even when it drops a record.** The reason goes only
   to the debug email in the client's Web-to-Case settings, so ask them to keep
-  one. Values are cut to the field's max length before sending, because
+  one. Values are also cut to the field's max length before sending, because
   Salesforce rejects an overrun the same silent way.
+- **Inputs are capped at the Salesforce field's length.** Every mapped
+  element gets the field's `maxlength`, so the visitor meets the limit on the
+  form. Disabled mappings count too, so the form reads the same in every
+  environment.
 - **Turn off Web-to-Case's own reCAPTCHA.** Submissions are posted
   server-side and can't solve it; guard the site form with its own CAPTCHA.
 - **Assignment and auto-response rules** run as they do for any Web-to-Case

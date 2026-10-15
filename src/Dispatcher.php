@@ -64,6 +64,32 @@ class Dispatcher {
   }
 
   /**
+   * The longest value Salesforce keeps for each mapped site form element.
+   *
+   * Every mapping counts, enabled or not, so the form reads the same in an
+   * environment that doesn't send. The shortest wins when two disagree.
+   *
+   * @return int[]
+   *   Max lengths keyed by site form element.
+   */
+  public function maxlengths(string $source, string $bundle): array {
+    $limits = [];
+    $mappings = $this->entityTypeManager->getStorage('ash_salesforce_mapping')->loadByProperties([
+      'source' => "$source:$bundle",
+    ]);
+    foreach ($mappings as $mapping) {
+      $form = $this->form($mapping);
+      foreach ($form ? $mapping->getFields() : [] as $element => $key) {
+        $max = $form->field($key)?->maxlength;
+        if ($max) {
+          $limits[$element] = min($max, $limits[$element] ?? $max);
+        }
+      }
+    }
+    return $limits;
+  }
+
+  /**
    * Builds the POST body for one mapping.
    */
   public function payload(Mapping $mapping, ParsedForm $form, array $values): array {
