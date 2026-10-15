@@ -6,3 +6,8 @@ entity.ash_salesforce_form.collection:
   title: 'Salesforce forms'
   route_name: entity.ash_salesforce_form.collection
   base_route: entity.ash_salesforce_mapping.collection
+ash_salesforce.settings:
+  title: 'Settings'
+  route_name: ash_salesforce.settings
+  base_route: entity.ash_salesforce_mapping.collection
+  weight: 10

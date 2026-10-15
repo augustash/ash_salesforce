@@ -1,0 +1,7 @@
+ash_salesforce.settings:
+  path: '/admin/config/services/ash-salesforce/settings'
+  defaults:
+    _form: '\Drupal\ash_salesforce\Form\SettingsForm'
+    _title: 'Salesforce form settings'
+  requirements:
+    _permission: 'administer ash_salesforce'

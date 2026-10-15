@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for Ash Salesforce.
+ */
+
+/**
+ * Add the site label that starts each mapping's origin.
+ */
+function ash_salesforce_update_10001() {
+  $config = \Drupal::configFactory()->getEditable('ash_salesforce.settings');
+  if ($config->isNew()) {
+    $config->set('site_label', '')->save(TRUE);
+  }
+}

@@ -47,6 +47,9 @@ class MappingWizardTest extends BrowserTestBase {
    * A form is pasted, mapped field by field, and saved.
    */
   public function testWizard(): void {
+    $this->drupalGet('admin/config/services/ash-salesforce/settings');
+    $this->submitForm(['site_label' => 'Metro'], 'Save configuration');
+
     $this->drupalGet('admin/config/services/ash-salesforce/forms/add');
     $this->submitForm([
       'label' => 'UAT',
@@ -85,6 +88,9 @@ class MappingWizardTest extends BrowserTestBase {
     // Fixed values: picklists by label, standard fields the form left out.
     $this->assertSession()->fieldExists('constants[origin]');
     $this->assertSession()->fieldNotExists('constants[email]');
+    // The origin is suggested as site label + form label; a picklist isn't.
+    $this->assertSession()->fieldValueEquals('constants[origin]', 'Metro Website feedback');
+    $this->assertSession()->checkboxChecked('edit-constants-recordtype-');
     $this->submitForm([
       'constants[recordType]' => 'NSC Cases',
       'constants[origin]' => 'Website feedback',
@@ -114,6 +120,14 @@ class MappingWizardTest extends BrowserTestBase {
     // Editing opens on the summary.
     $this->drupalGet('admin/config/services/ash-salesforce/feedback');
     $this->assertSession()->buttonExists('change__mail');
+
+    // An existing mapping's origin is the editor's: cleared stays cleared.
+    $this->submitForm([], 'change_constants');
+    $this->submitForm(['constants[origin]' => ''], 'Continue');
+    $this->submitForm([], 'Save');
+    $this->drupalGet('admin/config/services/ash-salesforce/feedback');
+    $this->submitForm([], 'change_constants');
+    $this->assertSession()->fieldValueEquals('constants[origin]', '');
   }
 
 }

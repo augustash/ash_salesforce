@@ -38,3 +38,12 @@ ash_salesforce.mapping.*:
       label: 'Fixed value per Salesforce field key; a picklist value is its option label'
       sequence:
         type: string
+
+ash_salesforce.settings:
+  type: config_object
+  label: 'Ash Salesforce settings'
+  mapping:
+    site_label:
+      # Not translatable: an origin has to read the same whatever the language.
+      type: string
+      label: 'Short site name that starts each origin; empty uses the site name'

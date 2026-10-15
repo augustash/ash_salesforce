@@ -26,6 +26,11 @@ class MappingForm extends EntityForm {
   protected const WRAPPER = 'ash-salesforce-wizard';
 
   /**
+   * Standard fields that say where a record came from, by form kind.
+   */
+  protected const ORIGINS = ['origin', 'lead_source'];
+
+  /**
    * The site form sources.
    *
    * @var \Drupal\ash_salesforce\Source\SourceManager
@@ -209,11 +214,18 @@ class MappingForm extends EntityForm {
     /** @var \Drupal\ash_salesforce\Entity\Mapping $mapping */
     $mapping = $this->entity;
     $form['intro'] = [
-      '#markup' => '<p>' . $this->t('Values sent with every submission, such as the record type that routes it or an origin that says which site it came from. Leave the rest empty.') . '</p>',
+      '#markup' => '<p>' . $this->t('Values sent with every submission, such as the record type that routes it or an origin that says which site and form it came from. Leave the rest empty.') . '</p>',
     ];
     $form['constants'] = ['#tree' => TRUE];
+    $constants = $mapping->getConstants();
+    $suggest = $mapping->isNew() && !$form_state->get('constants_saved');
     foreach ($this->constantTargets() as $key => $field) {
-      $default = $mapping->getConstants()[$key] ?? '';
+      $default = $constants[$key] ?? '';
+      // Suggested on a new mapping until this step is first saved; after
+      // that, even an empty value is the editor's choice.
+      if ($suggest && in_array($key, self::ORIGINS, TRUE) && !$field->options) {
+        $default = $this->origin();
+      }
       $form['constants'][$key] = $field->options ? [
         '#type' => 'radios',
         '#title' => $field->label,
@@ -377,6 +389,7 @@ class MappingForm extends EntityForm {
    */
   public function saveConstants(array &$form, FormStateInterface $form_state): void {
     $this->entity->setConstants(array_map('strval', $form_state->getValue('constants') ?? []));
+    $form_state->set('constants_saved', TRUE);
     $this->go($form_state, 'summary');
   }
 
@@ -478,6 +491,19 @@ class MappingForm extends EntityForm {
     catch (\InvalidArgumentException) {
       return NULL;
     }
+  }
+
+  /**
+   * The suggested origin: "<site label> <site form label>".
+   *
+   * One Salesforce org often takes records from several sites, and from
+   * several forms on each, so the origin names both.
+   */
+  protected function origin(): string {
+    $site = $this->config('ash_salesforce.settings')->get('site_label') ?: $this->config('system.site')->get('name');
+    [$source_id, $bundle] = $this->entity->getSource();
+    $form = $this->sources->get($source_id)?->forms()[$bundle] ?? '';
+    return trim("$site $form");
   }
 
   /**
